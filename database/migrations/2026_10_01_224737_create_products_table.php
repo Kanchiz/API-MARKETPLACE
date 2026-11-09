@@ -22,6 +22,7 @@ return new class extends Migration
             $table->string('status')->default('available'); // 'available', 'paused', 'sold'
             $table->string('location')->nullable();
             $table->string('image_path')->nullable();
+            $table->softDeletes(); // baja lógica — HU06 Sprint 4
             $table->timestamps();
 
             // indices de consulta frecuente para catalogo

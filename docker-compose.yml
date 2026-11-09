@@ -1,6 +1,49 @@
-version: '3.8'
 
 services:
+
+  # PostgreSQL 16
+  db:
+    image: postgres:16-alpine
+    container_name: marketplace_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: marketplace
+      POSTGRES_USER: marketplace_user
+      POSTGRES_PASSWORD: marketplace_pass
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - marketplace_net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U marketplace_user -d marketplace"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # MongoDB 7.0
+  mongo:
+    image: mongo:7.0
+    container_name: marketplace_mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: mongo_user
+      MONGO_INITDB_ROOT_PASSWORD: mongo_pass
+      MONGO_INITDB_DATABASE: marketplace_media
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodata:/data/db
+    networks:
+      - marketplace_net
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # API Laravel
   api:
     build:
       context: .
@@ -13,12 +56,33 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - APP_ENV=local
-      - APP_DEBUG=true
-      - DB_CONNECTION=sqlite
-      - DB_DATABASE=/var/www/database/database.sqlite
+      APP_ENV: local
+      APP_DEBUG: "true"
+      APP_KEY: base64:NB7w33MYn9xuyL97Y+lMX1gekbxG8RMZ26hejsGvdVU=
+      DB_CONNECTION: pgsql
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_DATABASE: marketplace
+      DB_USERNAME: marketplace_user
+      DB_PASSWORD: marketplace_pass
+      MONGO_HOST: mongo
+      MONGO_PORT: 27017
+      MONGO_DATABASE: marketplace_media
+      MONGO_USERNAME: mongo_user
+      MONGO_PASSWORD: mongo_pass
+    depends_on:
+      db:
+        condition: service_healthy
+      mongo:
+        condition: service_healthy
     networks:
       - marketplace_net
+
+volumes:
+  pgdata:
+    driver: local
+  mongodata:
+    driver: local
 
 networks:
   marketplace_net:

@@ -1,6 +1,6 @@
-FROM php:8.2-cli-alpine
+FROM php:8.4-cli-alpine
 
-# dependencias basicas del sistema y sqlite
+# dependencias del sistema para Laravel + PostgreSQL + GD
 RUN apk add --no-cache \
     curl \
     git \
@@ -8,18 +8,28 @@ RUN apk add --no-cache \
     libxml2-dev \
     zip \
     unzip \
-    sqlite \
-    sqlite-dev
+    postgresql-dev \
+    oniguruma-dev
 
-# extensiones de php requeridas para laravel
-RUN docker-php-ext-install pdo pdo_sqlite bcmath gd
+# extensiones PHP requeridas
+RUN docker-php-ext-install \
+    pdo \
+    pdo_pgsql \
+    pgsql \
+    bcmath \
+    gd \
+    mbstring \
+    xml
 
 # composer oficial
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www
 
+# entrypoint script
+COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+
 EXPOSE 8000
 
-# comando de inicio del servidor
-CMD php artisan serve --host=0.0.0.0 --port=8000
+ENTRYPOINT ["docker-entrypoint.sh"]
