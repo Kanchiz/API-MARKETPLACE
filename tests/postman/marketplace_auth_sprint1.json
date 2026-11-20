@@ -1,0 +1,83 @@
+{
+  "info": {
+    "name": "Marketplace API - Sprint 1 (HU01)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. Registro Exitoso (201)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {"key": "Accept", "value": "application/json"},
+          {"key": "Content-Type", "value": "application/json"}
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Kevin Peraza\",\n  \"email\": \"test_qa_postman@test.com\",\n  \"password\": \"password123\",\n  \"phone\": \"6671234567\",\n  \"role\": \"buyer\"\n}"
+        },
+        "url": "http://localhost:8000/api/v1/auth/register"
+      }
+    },
+    {
+      "name": "2. Registro Duplicado (409)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {"key": "Accept", "value": "application/json"},
+          {"key": "Content-Type", "value": "application/json"}
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Kevin Duplicado\",\n  \"email\": \"test_qa_postman@test.com\",\n  \"password\": \"password123\"\n}"
+        },
+        "url": "http://localhost:8000/api/v1/auth/register"
+      }
+    },
+    {
+      "name": "3. Validacion de Campos (422)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {"key": "Accept", "value": "application/json"},
+          {"key": "Content-Type", "value": "application/json"}
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"\",\n  \"email\": \"correo_invalido\",\n  \"password\": \"123\"\n}"
+        },
+        "url": "http://localhost:8000/api/v1/auth/register"
+      }
+    },
+    {
+      "name": "4. Login Exitoso (200)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {"key": "Accept", "value": "application/json"},
+          {"key": "Content-Type", "value": "application/json"}
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"test_qa_postman@test.com\",\n  \"password\": \"password123\"\n}"
+        },
+        "url": "http://localhost:8000/api/v1/auth/login"
+      }
+    },
+    {
+      "name": "5. Login Credenciales Invalidas (401)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {"key": "Accept", "value": "application/json"},
+          {"key": "Content-Type", "value": "application/json"}
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"test_qa_postman@test.com\",\n  \"password\": \"incorrecta\"\n}"
+        },
+        "url": "http://localhost:8000/api/v1/auth/login"
+      }
+    }
+  ]
+}
